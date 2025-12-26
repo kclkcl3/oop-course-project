@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Форма платежа - Виртуальный магазин</title>
+		<link rel="stylesheet" th:href="@{/css/style.css}" />
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<h1>Новый платёж</h1>
+			</header>
+
+			<nav>
+				<a th:href="@{/}">Главная</a>
+				<a th:href="@{/products}">Товары</a>
+				<a th:href="@{/customers}">Покупатели</a>
+				<a th:href="@{/orders}">Заказы</a>
+				<a th:href="@{/cart/select-customer}">Корзины</a>
+				<a th:href="@{/reviews}">Отзывы</a>
+				<a th:href="@{/payments}">Платежи</a>
+				<a th:href="@{/shipments}">Доставки</a>
+				<a th:href="@{/analytics}">Аналитика</a>
+			</nav>
+
+			<h2>Добавление платежа</h2>
+
+			<form th:action="@{/payments/save}" method="post" th:object="${payment}">
+				<div class="form-group">
+					<label for="orderId">Заказ *</label>
+					<select id="orderId" th:field="*{orderId}" required>
+						<option value="">Выберите заказ</option>
+						<option
+							th:each="order : ${orders}"
+							th:value="${order.orderId}"
+							th:text="${#strings.substring(order.orderId.toString(), 0, 8) + ' - ' + order.totalAmount + ' ₽'}"
+						>
+							Заказ
+						</option>
+					</select>
+				</div>
+
+				<div class="form-group">
+					<label for="amount">Сумма *</label>
+					<input
+						type="number"
+						step="0.01"
+						id="amount"
+						th:field="*{amount}"
+						required
+					/>
+				</div>
+
+				<div class="form-group">
+					<label for="status">Статус *</label>
+					<select id="status" th:field="*{status}" required>
+						<option value="PENDING">В ожидании</option>
+						<option value="COMPLETED">Завершён</option>
+						<option value="FAILED">Ошибка</option>
+					</select>
+				</div>
+
+				<div class="form-actions">
+					<button type="submit" class="btn btn-primary">Сохранить</button>
+					<a th:href="@{/payments}" class="btn">Отмена</a>
+				</div>
+			</form>
+		</div>
+	</body>
+</html>

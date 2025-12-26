@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Форма покупателя - Виртуальный магазин</title>
+		<link rel="stylesheet" th:href="@{/css/style.css}" />
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<h1>Форма покупателя</h1>
+			</header>
+
+			<nav>
+				<a th:href="@{/}">Главная</a>
+				<a th:href="@{/products}">Товары</a>
+				<a th:href="@{/customers}">Покупатели</a>
+				<a th:href="@{/orders}">Заказы</a>
+				<a th:href="@{/cart/select-customer}">Корзины</a>
+				<a th:href="@{/reviews}">Отзывы</a>
+				<a th:href="@{/payments}">Платежи</a>
+				<a th:href="@{/shipments}">Доставки</a>
+				<a th:href="@{/analytics}">Аналитика</a>
+			</nav>
+
+			<h2
+				th:text="${customer.customerId != null ? 'Редактирование покупателя' : 'Новый покупатель'}"
+			>
+				Новый покупатель
+			</h2>
+
+			<form
+				th:action="@{/customers/save}"
+				method="post"
+				th:object="${customer}"
+			>
+				<input type="hidden" th:field="*{customerId}" />
+
+				<div class="form-group">
+					<label for="firstName">Имя *</label>
+					<input type="text" id="firstName" th:field="*{firstName}" required />
+				</div>
+
+				<div class="form-group">
+					<label for="lastName">Фамилия *</label>
+					<input type="text" id="lastName" th:field="*{lastName}" required />
+				</div>
+
+				<div class="form-group">
+					<label for="email">Email *</label>
+					<input type="email" id="email" th:field="*{email}" required />
+				</div>
+
+				<div class="form-group">
+					<label for="phone">Телефон</label>
+					<input
+						type="tel"
+						id="phone"
+						pattern="\+7[0-9]{10}"
+						title="Введите номер в формате +71234567890"
+						th:field="*{phone}"
+					/>
+				</div>
+
+				<div class="form-group">
+					<label for="address">Адрес</label>
+					<textarea id="address" rows="3" th:field="*{address}"></textarea>
+				</div>
+
+				<div class="form-actions">
+					<button type="submit" class="btn btn-primary">Сохранить</button>
+					<a th:href="@{/customers}" class="btn">Отмена</a>
+				</div>
+			</form>
+		</div>
+	</body>
+</html>

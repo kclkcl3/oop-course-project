@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Аналитика - Виртуальный магазин</title>
+		<link rel="stylesheet" th:href="@{/css/style.css}" />
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<h1>Аналитика продаж</h1>
+			</header>
+
+			<nav>
+				<a th:href="@{/}">Главная</a>
+				<a th:href="@{/products}">Товары</a>
+				<a th:href="@{/customers}">Покупатели</a>
+				<a th:href="@{/orders}">Заказы</a>
+				<a th:href="@{/cart/select-customer}">Корзины</a>
+				<a th:href="@{/reviews}">Отзывы</a>
+				<a th:href="@{/payments}">Платежи</a>
+				<a th:href="@{/shipments}">Доставки</a>
+				<a th:href="@{/analytics}">Аналитика</a>
+			</nav>
+
+			<div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+			<h2>Прогнозирование продаж с использованием линейной регрессии</h2>
+
+			<form th:action="@{/analytics}" method="get" style="margin: 20px 0">
+				<div class="form-group">
+					<label for="days">Прогноз на (дней):</label>
+					<input
+						type="number"
+						id="days"
+						name="days"
+						min="1"
+						max="365"
+						th:value="${days}"
+						required
+					/>
+					<button
+						type="submit"
+						class="btn btn-primary"
+						style="margin-left: 10px"
+					>
+						Рассчитать
+					</button>
+				</div>
+			</form>
+
+			<div th:if="${forecast != null}">
+				<div
+					style="
+						background: #f8f9fa;
+						padding: 20px;
+						border: 1px solid #dee2e6;
+						margin: 20px 0;
+					"
+				>
+					<h3>Результаты прогноза</h3>
+					<p>
+						<strong>Прогноз на:</strong>
+						<span th:text="${forecast.daysAhead}">7</span> дней
+					</p>
+					<p>
+						<strong>Ожидаемая сумма продаж:</strong>
+						<span
+							style="font-size: 1.5em; color: #212529; font-weight: 600"
+							th:text="${#numbers.formatDecimal(forecast.forecastedAmount, 1, 2)} + ' ₽'"
+						>
+							50000.00 ₽
+						</span>
+					</p>
+				</div>
+
+				<div
+					style="
+						background: #f8f9fa;
+						padding: 20px;
+						border: 1px solid #dee2e6;
+						margin: 20px 0;
+					"
+				>
+					<h3>Параметры модели линейной регрессии</h3>
+					<p>
+						<strong>Уравнение:</strong>
+						<code th:text="${forecast.regression.equation}"
+							>y = 1000x + 5000</code
+						>
+					</p>
+					<p>
+						<strong>Коэффициент наклона (a):</strong>
+						<span
+							th:text="${#numbers.formatDecimal(forecast.regression.slope, 1, 4)}"
+							>1000.0000</span
+						>
+					</p>
+					<p>
+						<strong>Свободный член (b):</strong>
+						<span
+							th:text="${#numbers.formatDecimal(forecast.regression.intercept, 1, 4)}"
+							>5000.0000</span
+						>
+					</p>
+					<p>
+						<strong>Коэффициент детерминации (R²):</strong>
+						<span
+							th:text="${#numbers.formatDecimal(forecast.regression.rSquared, 1, 4)}"
+							>0.8500</span
+						>
+					</p>
+					<p style="margin-top: 10px; color: #6c757d; font-size: 0.9em">
+						R² показывает качество модели. Чем ближе к 1, тем лучше модель
+						объясняет данные.
+					</p>
+				</div>
+
+				<div
+					style="
+						background: #f8f9fa;
+						padding: 20px;
+						border: 1px solid #dee2e6;
+						margin: 20px 0;
+					"
+				>
+					<h3>Исторические данные</h3>
+					<p>
+						<strong>Количество точек данных:</strong>
+						<span th:text="${#lists.size(forecast.historicalDays)}">10</span>
+					</p>
+
+					<table style="margin-top: 15px">
+						<thead>
+							<tr>
+								<th>День</th>
+								<th>Сумма продаж (₽)</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr
+								th:each="i : ${#numbers.sequence(0, #lists.size(forecast.historicalDays) - 1)}"
+							>
+								<td th:text="${forecast.historicalDays[i]}">0</td>
+								<td
+									th:text="${#numbers.formatDecimal(forecast.historicalSales[i], 1, 2)}"
+								>
+									1000.00
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<div
+					style="
+						background: #f8f9fa;
+						padding: 20px;
+						border: 1px solid #dee2e6;
+						margin: 20px 0;
+					"
+				>
+					<h3>Как работает линейная регрессия</h3>
+					<p>
+						Модель находит линию наилучшего соответствия для исторических данных
+						о продажах.
+					</p>
+					<p><strong>Формула:</strong> y = ax + b</p>
+					<ul style="margin-top: 10px; line-height: 1.8">
+						<li><strong>y</strong> - прогнозируемая сумма продаж</li>
+						<li><strong>x</strong> - количество дней с начала наблюдений</li>
+						<li>
+							<strong>a</strong> - коэффициент наклона (насколько изменяются
+							продажи за день)
+						</li>
+						<li><strong>b</strong> - базовая сумма продаж</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

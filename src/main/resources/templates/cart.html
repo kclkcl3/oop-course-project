@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Корзина - Виртуальный магазин</title>
+		<link rel="stylesheet" th:href="@{/css/style.css}" />
+		<script>
+			function updateMaxQuantity() {
+				const select = document.getElementById('productId');
+				const quantityInput = document.getElementById('quantity');
+				const selectedOption = select.options[select.selectedIndex];
+
+				if (selectedOption.value) {
+					const maxQty = selectedOption.getAttribute('data-quantity');
+					quantityInput.max = maxQty;
+					quantityInput.value = Math.min(quantityInput.value, maxQty);
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<h1>Корзина</h1>
+			</header>
+
+			<nav>
+				<a th:href="@{/}">Главная</a>
+				<a th:href="@{/products}">Товары</a>
+				<a th:href="@{/customers}">Покупатели</a>
+				<a th:href="@{/orders}">Заказы</a>
+				<a th:href="@{/cart/select-customer}">Корзины</a>
+				<a th:href="@{/reviews}">Отзывы</a>
+				<a th:href="@{/payments}">Платежи</a>
+				<a th:href="@{/shipments}">Доставки</a>
+				<a th:href="@{/analytics}">Аналитика</a>
+			</nav>
+
+			<div
+				th:if="${success}"
+				class="alert alert-success"
+				th:text="${success}"
+			></div>
+			<div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+			<h2>
+				Корзина покупателя:
+				<span
+					th:text="${customer != null ? customer.firstName + ' ' + customer.lastName : 'Неизвестен'}"
+					>Имя</span
+				>
+			</h2>
+
+			<div th:if="${cartItems != null && !cartItems.empty}">
+				<table>
+					<thead>
+						<tr>
+							<th>Товар</th>
+							<th>Цена</th>
+							<th>Количество</th>
+							<th>Сумма</th>
+							<th>Действия</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="item : ${cartItems}">
+							<td
+								th:text="${item.product != null ? item.product.name : 'ID: ' + #strings.substring(item.productId.toString(), 0, 8)}"
+							>
+								Товар
+							</td>
+							<td th:text="${item.price} + ' ₽'">1000 ₽</td>
+							<td th:text="${item.quantity}">1</td>
+							<td
+								th:text="${#numbers.formatDecimal(item.price * item.quantity, 1, 2)} + ' ₽'"
+							>
+								1000 ₽
+							</td>
+							<td>
+								<form
+									th:action="@{/cart/remove/{id}(id=${item.cartItemId})}"
+									method="post"
+									style="display: inline"
+								>
+									<input
+										type="hidden"
+										name="customerId"
+										th:value="${customer.customerId}"
+									/>
+									<button
+										type="submit"
+										class="btn btn-small"
+										onclick="return confirm('Удалить товар?')"
+									>
+										Удалить
+									</button>
+								</form>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<div
+					style="
+						background: #f8f9fa;
+						padding: 20px;
+						border: 1px solid #dee2e6;
+						margin: 20px 0;
+					"
+				>
+					<h3>
+						Итого:
+						<span th:text="${#numbers.formatDecimal(total, 1, 2)} + ' ₽'"
+							>0.00 ₽</span
+						>
+					</h3>
+					<form
+						th:action="@{/cart/checkout/{id}(id=${customer.customerId})}"
+						method="post"
+						style="margin-top: 15px"
+					>
+						<button type="submit" class="btn btn-primary">
+							Оформить заказ
+						</button>
+					</form>
+				</div>
+			</div>
+
+			<div th:if="${cartItems == null || cartItems.empty}">
+				<p style="text-align: center; margin: 40px 0; color: #6c757d">
+					Корзина пуста
+				</p>
+			</div>
+
+			<h3 style="margin-top: 40px">Добавить товар в корзину</h3>
+
+			<form th:action="@{/cart/add}" method="post">
+				<input
+					type="hidden"
+					name="customerId"
+					th:value="${customer.customerId}"
+				/>
+
+				<div class="form-group">
+					<label for="productId">Товар *</label>
+					<select
+						id="productId"
+						name="productId"
+						required
+						onchange="updateMaxQuantity()"
+					>
+						<option value="">Выберите товар</option>
+						<option
+							th:each="product : ${@productService.getAllProducts()}"
+							th:value="${product.productId}"
+							th:attr="data-quantity=${product.quantity}"
+							th:text="${product.name + ' - ' + product.price + ' ₽ (остаток: ' + product.quantity + ')'}"
+						>
+							Товар
+						</option>
+					</select>
+				</div>
+
+				<div class="form-group">
+					<label for="quantity">Количество *</label>
+					<input
+						type="number"
+						id="quantity"
+						name="quantity"
+						min="1"
+						max="1"
+						value="1"
+						required
+					/>
+				</div>
+
+				<div class="form-actions">
+					<button type="submit" class="btn btn-primary">
+						Добавить в корзину
+					</button>
+				</div>
+			</form>
+		</div>
+	</body>
+</html>

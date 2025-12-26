@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Отзывы - Виртуальный магазин</title>
+		<link rel="stylesheet" th:href="@{/css/style.css}" />
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<h1>Отзывы</h1>
+			</header>
+
+			<nav>
+				<a th:href="@{/}">Главная</a>
+				<a th:href="@{/products}">Товары</a>
+				<a th:href="@{/customers}">Покупатели</a>
+				<a th:href="@{/orders}">Заказы</a>
+				<a th:href="@{/cart/select-customer}">Корзины</a>
+				<a th:href="@{/reviews}">Отзывы</a>
+				<a th:href="@{/payments}">Платежи</a>
+				<a th:href="@{/shipments}">Доставки</a>
+				<a th:href="@{/analytics}">Аналитика</a>
+			</nav>
+
+			<div
+				th:if="${success}"
+				class="alert alert-success"
+				th:text="${success}"
+			></div>
+			<div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+			<div class="action-buttons">
+				<a th:href="@{/reviews/new}" class="btn btn-primary">Добавить отзыв</a>
+			</div>
+
+			<h2>Все отзывы</h2>
+
+			<table>
+				<thead>
+					<tr>
+						<th>ID товара</th>
+						<th>ID покупателя</th>
+						<th>Рейтинг</th>
+						<th>Комментарий</th>
+						<th>Дата</th>
+						<th>Действия</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="review : ${reviews}">
+						<td
+							th:text="${#strings.substring(review.productId.toString(), 0, 8)}"
+						>
+							12345678
+						</td>
+						<td
+							th:text="${#strings.substring(review.customerId.toString(), 0, 8)}"
+						>
+							87654321
+						</td>
+						<td th:text="${review.rating}">4.5</td>
+						<td th:text="${review.comment}">Отличный товар</td>
+						<td
+							th:text="${#temporals.format(review.reviewDate, 'dd.MM.yyyy HH:mm')}"
+						>
+							25.12.2025 10:30
+						</td>
+						<td>
+							<form
+								th:action="@{/reviews/delete/{id}(id=${review.reviewId})}"
+								method="post"
+								style="display: inline"
+							>
+								<button
+									type="submit"
+									class="btn btn-small"
+									onclick="return confirm('Удалить отзыв?')"
+								>
+									Удалить
+								</button>
+							</form>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</body>
+</html>

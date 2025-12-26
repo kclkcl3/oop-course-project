@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Доставки - Виртуальный магазин</title>
+		<link rel="stylesheet" th:href="@{/css/style.css}" />
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<h1>Доставки</h1>
+			</header>
+
+			<nav>
+				<a th:href="@{/}">Главная</a>
+				<a th:href="@{/products}">Товары</a>
+				<a th:href="@{/customers}">Покупатели</a>
+				<a th:href="@{/orders}">Заказы</a>
+				<a th:href="@{/cart/select-customer}">Корзины</a>
+				<a th:href="@{/reviews}">Отзывы</a>
+				<a th:href="@{/payments}">Платежи</a>
+				<a th:href="@{/shipments}">Доставки</a>
+				<a th:href="@{/analytics}">Аналитика</a>
+			</nav>
+
+			<div
+				th:if="${success}"
+				class="alert alert-success"
+				th:text="${success}"
+			></div>
+			<div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+			<h2>Список доставок</h2>
+
+			<a
+				th:href="@{/shipments/new}"
+				class="btn btn-primary"
+				style="margin-bottom: 20px"
+				>Новая доставка</a
+			>
+
+			<table>
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Заказ</th>
+						<th>Трек-номер</th>
+						<th>Дата отправки</th>
+						<th>Статус</th>
+						<th>Изменить статус</th>
+						<th>Действия</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="shipment : ${shipments}">
+						<td
+							th:text="${#strings.substring(shipment.shipmentId.toString(), 0, 8)}"
+						>
+							ID
+						</td>
+						<td
+							th:text="${#strings.substring(shipment.orderId.toString(), 0, 8)}"
+						>
+							Order ID
+						</td>
+						<td th:text="${shipment.trackingNumber}">TRACK-001</td>
+						<td
+							th:text="${#temporals.format(shipment.shipmentDate, 'dd.MM.yyyy HH:mm')}"
+						>
+							01.01.2025
+						</td>
+						<td>
+							<span
+								th:class="${shipment.status.name() == 'DELIVERED' ? 'badge badge-success' : 
+                                        shipment.status.name() == 'IN_TRANSIT' ? 'badge badge-info' : 
+                                        'badge badge-warning'}"
+								th:text="${shipment.status.name() == 'SHIPPED' ? 'Отправлен' :
+                                       shipment.status.name() == 'IN_TRANSIT' ? 'В пути' :
+                                       'Доставлен'}"
+							>
+								Статус
+							</span>
+						</td>
+						<td>
+							<form
+								th:action="@{/shipments/update-status/{id}(id=${shipment.shipmentId})}"
+								method="post"
+								style="display: inline-flex; gap: 5px"
+							>
+								<select name="status" style="font-size: 0.85em; padding: 4px">
+									<option
+										value="SHIPPED"
+										th:selected="${shipment.status.name() == 'SHIPPED'}"
+									>
+										Отправлен
+									</option>
+									<option
+										value="IN_TRANSIT"
+										th:selected="${shipment.status.name() == 'IN_TRANSIT'}"
+									>
+										В пути
+									</option>
+									<option
+										value="DELIVERED"
+										th:selected="${shipment.status.name() == 'DELIVERED'}"
+									>
+										Доставлен
+									</option>
+								</select>
+								<button type="submit" class="btn btn-small">Обновить</button>
+							</form>
+						</td>
+						<td>
+							<form
+								th:action="@{/shipments/delete/{id}(id=${shipment.shipmentId})}"
+								method="post"
+								style="display: inline"
+							>
+								<button
+									type="submit"
+									class="btn btn-small"
+									onclick="return confirm('Удалить доставку?')"
+								>
+									Удалить
+								</button>
+							</form>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</body>
+</html>

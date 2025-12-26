@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Форма отзыва - Виртуальный магазин</title>
+		<link rel="stylesheet" th:href="@{/css/style.css}" />
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<h1>Новый отзыв</h1>
+			</header>
+
+			<nav>
+				<a th:href="@{/}">Главная</a>
+				<a th:href="@{/products}">Товары</a>
+				<a th:href="@{/customers}">Покупатели</a>
+				<a th:href="@{/orders}">Заказы</a>
+				<a th:href="@{/cart/select-customer}">Корзины</a>
+				<a th:href="@{/reviews}">Отзывы</a>
+				<a th:href="@{/payments}">Платежи</a>
+				<a th:href="@{/shipments}">Доставки</a>
+				<a th:href="@{/analytics}">Аналитика</a>
+			</nav>
+
+			<h2>Добавление отзыва</h2>
+
+			<form th:action="@{/reviews/save}" method="post" th:object="${review}">
+				<div class="form-group">
+					<label for="productId">Товар *</label>
+					<select id="productId" th:field="*{productId}" required>
+						<option value="">Выберите товар</option>
+						<option
+							th:each="product : ${products}"
+							th:value="${product.productId}"
+							th:text="${product.name}"
+						>
+							Товар
+						</option>
+					</select>
+				</div>
+
+				<div class="form-group">
+					<label for="customerId">Покупатель *</label>
+					<select id="customerId" th:field="*{customerId}" required>
+						<option value="">Выберите покупателя</option>
+						<option
+							th:each="customer : ${customers}"
+							th:value="${customer.customerId}"
+							th:text="${customer.firstName + ' ' + customer.lastName}"
+						>
+							Покупатель
+						</option>
+					</select>
+				</div>
+
+				<div class="form-group">
+					<label for="rating">Рейтинг (1-5) *</label>
+					<input
+						type="number"
+						step="0.1"
+						min="1"
+						max="5"
+						id="rating"
+						th:field="*{rating}"
+						required
+					/>
+				</div>
+
+				<div class="form-group">
+					<label for="comment">Комментарий</label>
+					<textarea id="comment" rows="5" th:field="*{comment}"></textarea>
+				</div>
+
+				<div class="form-actions">
+					<button type="submit" class="btn btn-primary">Сохранить</button>
+					<a th:href="@{/reviews}" class="btn">Отмена</a>
+				</div>
+			</form>
+		</div>
+	</body>
+</html>

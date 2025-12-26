@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Детали заказа - Виртуальный магазин</title>
+		<link rel="stylesheet" th:href="@{/css/style.css}" />
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<h1>Детали заказа</h1>
+			</header>
+
+			<nav>
+				<a th:href="@{/}">Главная</a>
+				<a th:href="@{/products}">Товары</a>
+				<a th:href="@{/customers}">Покупатели</a>
+				<a th:href="@{/orders}">Заказы</a>
+				<a th:href="@{/cart/select-customer}">Корзины</a>
+				<a th:href="@{/reviews}">Отзывы</a>
+				<a th:href="@{/payments}">Платежи</a>
+				<a th:href="@{/shipments}">Доставки</a>
+				<a th:href="@{/analytics}">Аналитика</a>
+			</nav>
+
+			<div
+				th:if="${success}"
+				class="alert alert-success"
+				th:text="${success}"
+			></div>
+			<div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+			<h2>
+				Заказ
+				<span th:text="${#strings.substring(order.orderId.toString(), 0, 8)}"
+					>ID</span
+				>
+			</h2>
+
+			<div
+				style="
+					background: #f8f9fa;
+					padding: 20px;
+					border: 1px solid #dee2e6;
+					margin: 20px 0;
+				"
+			>
+				<p>
+					<strong>ID заказа:</strong>
+					<span th:text="${order.orderId}">UUID</span>
+				</p>
+				<p>
+					<strong>Покупатель:</strong>
+					<span
+						th:text="${order.customer != null ? order.customer.firstName + ' ' + order.customer.lastName : 'ID: ' + order.customerId}"
+					>
+						Имя
+					</span>
+				</p>
+				<p>
+					<strong>Дата заказа:</strong>
+					<span
+						th:text="${#temporals.format(order.orderDate, 'dd.MM.yyyy HH:mm')}"
+						>01.01.2025</span
+					>
+				</p>
+				<p>
+					<strong>Общая сумма:</strong>
+					<span
+						style="font-size: 1.3em; color: #212529"
+						th:text="${order.totalAmount} + ' ₽'"
+						>1000 ₽</span
+					>
+				</p>
+
+				<div style="margin-top: 20px">
+					<p><strong>Текущий статус:</strong></p>
+					<span
+						th:class="${order.status.name() == 'DELIVERED' ? 'badge badge-success' : 
+                                order.status.name() == 'SHIPPED' ? 'badge badge-info' : 
+                                order.status.name() == 'CANCELLED' ? 'badge badge-danger' : 
+                                'badge badge-warning'}"
+						th:text="${order.status.name() == 'PENDING' ? 'В ожидании' :
+                               order.status.name() == 'SHIPPED' ? 'Отправлен' :
+                               order.status.name() == 'DELIVERED' ? 'Доставлен' :
+                               'Отменён'}"
+					>
+						Статус
+					</span>
+
+					<form
+						th:action="@{/orders/update-status/{id}(id=${order.orderId})}"
+						method="post"
+						style="margin-top: 15px"
+					>
+						<div class="form-group">
+							<label for="status">Изменить статус:</label>
+							<select id="status" name="status" required>
+								<option
+									value="PENDING"
+									th:selected="${order.status.name() == 'PENDING'}"
+								>
+									В ожидании
+								</option>
+								<option
+									value="SHIPPED"
+									th:selected="${order.status.name() == 'SHIPPED'}"
+								>
+									Отправлен
+								</option>
+								<option
+									value="DELIVERED"
+									th:selected="${order.status.name() == 'DELIVERED'}"
+								>
+									Доставлен
+								</option>
+								<option
+									value="CANCELLED"
+									th:selected="${order.status.name() == 'CANCELLED'}"
+								>
+									Отменён
+								</option>
+							</select>
+						</div>
+						<button type="submit" class="btn btn-primary">
+							Обновить статус
+						</button>
+					</form>
+				</div>
+			</div>
+
+			<h3>Позиции заказа</h3>
+
+			<table>
+				<thead>
+					<tr>
+						<th>Товар</th>
+						<th>Цена</th>
+						<th>Количество</th>
+						<th>Сумма</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="item : ${order.orderItems}">
+						<td
+							th:text="${item.product != null ? item.product.name : 'ID: ' + #strings.substring(item.productId.toString(), 0, 8)}"
+						>
+							Товар
+						</td>
+						<td th:text="${item.price} + ' ₽'">1000 ₽</td>
+						<td th:text="${item.quantity}">1</td>
+						<td
+							th:text="${#numbers.formatDecimal(item.price * item.quantity, 1, 2)} + ' ₽'"
+						>
+							1000 ₽
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<div style="margin-top: 20px">
+				<a th:href="@{/orders}" class="btn">Вернуться к списку</a>
+			</div>
+		</div>
+	</body>
+</html>

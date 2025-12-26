@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Виртуальный магазин - Главная</title>
+		<link rel="stylesheet" th:href="@{/css/style.css}" />
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<h1>Виртуальный магазин</h1>
+				<p>Система управления интернет-магазином</p>
+			</header>
+
+			<nav>
+				<a th:href="@{/}">Главная</a>
+				<a th:href="@{/products}">Товары</a>
+				<a th:href="@{/customers}">Покупатели</a>
+				<a th:href="@{/orders}">Заказы</a>
+				<a th:href="@{/cart/select-customer}">Корзины</a>
+				<a th:href="@{/reviews}">Отзывы</a>
+				<a th:href="@{/payments}">Платежи</a>
+				<a th:href="@{/shipments}">Доставки</a>
+				<a th:href="@{/analytics}">Аналитика</a>
+			</nav>
+
+			<div class="stats">
+				<div class="stat-card">
+					<h3 th:text="${productCount}">0</h3>
+					<p>Товаров в каталоге</p>
+				</div>
+				<div class="stat-card">
+					<h3 th:text="${customerCount}">0</h3>
+					<p>Зарегистрировано покупателей</p>
+				</div>
+				<div class="stat-card">
+					<h3 th:text="${orderCount}">0</h3>
+					<p>Всего заказов</p>
+				</div>
+			</div>
+
+			<h2>Возможности системы</h2>
+			<ul style="line-height: 2">
+				<li>Управление товарами и категориями</li>
+				<li>Регистрация и учёт покупателей</li>
+				<li>Создание и обработка заказов</li>
+				<li>Статистика и аналитика продаж</li>
+				<li>REST API для интеграции</li>
+				<li>Линейная регрессия для прогнозирования</li>
+			</ul>
+		</div>
+	</body>
+</html>

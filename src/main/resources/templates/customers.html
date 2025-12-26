@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Покупатели - Виртуальный магазин</title>
+		<link rel="stylesheet" th:href="@{/css/style.css}" />
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<h1>Покупатели</h1>
+			</header>
+
+			<nav>
+				<a th:href="@{/}">Главная</a>
+				<a th:href="@{/products}">Товары</a>
+				<a th:href="@{/customers}">Покупатели</a>
+				<a th:href="@{/orders}">Заказы</a>
+				<a th:href="@{/cart/select-customer}">Корзины</a>
+				<a th:href="@{/reviews}">Отзывы</a>
+				<a th:href="@{/payments}">Платежи</a>
+				<a th:href="@{/shipments}">Доставки</a>
+				<a th:href="@{/analytics}">Аналитика</a>
+			</nav>
+
+			<div
+				th:if="${success}"
+				class="alert alert-success"
+				th:text="${success}"
+			></div>
+			<div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+			<div class="action-buttons">
+				<a th:href="@{/customers/new}" class="btn btn-primary"
+					>Добавить покупателя</a
+				>
+			</div>
+
+			<h2>Все покупатели</h2>
+
+			<table>
+				<thead>
+					<tr>
+						<th>Имя</th>
+						<th>Фамилия</th>
+						<th>Email</th>
+						<th>Телефон</th>
+						<th>Адрес</th>
+						<th>Дата регистрации</th>
+						<th>Действия</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="customer : ${customers}">
+						<td th:text="${customer.firstName}">Имя</td>
+						<td th:text="${customer.lastName}">Фамилия</td>
+						<td th:text="${customer.email}">email@example.com</td>
+						<td th:text="${customer.phone}">+7-900-000-0000</td>
+						<td th:text="${customer.address}">Адрес</td>
+						<td
+							th:text="${#temporals.format(customer.registrationDate, 'dd.MM.yyyy')}"
+						>
+							01.01.2025
+						</td>
+						<td>
+							<a
+								th:href="@{/customers/edit/{id}(id=${customer.customerId})}"
+								class="btn btn-small"
+								>Изменить</a
+							>
+							<form
+								th:action="@{/customers/delete/{id}(id=${customer.customerId})}"
+								method="post"
+								style="display: inline"
+							>
+								<button
+									type="submit"
+									class="btn btn-small"
+									onclick="return confirm('Удалить покупателя?')"
+								>
+									Удалить
+								</button>
+							</form>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</body>
+</html>
